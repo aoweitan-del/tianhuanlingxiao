@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>天幻凌霄 | 卡牌版图对战桌游</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@400;700;900&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#070a12;--sf:#0c1018;--el:#121822;--el2:#1a2230;
+  --accent:#7eb8e0;--accent-b:#a8d4f0;--accent-d:#4a8ab5;
+  --gold:#c8a45c;--gold-b:#e8c547;--gold-d:#8a6d2b;
+  --text:#e0e4ec;--muted:#8090a8;--dim:#506070;
+  --red:#e05555;--blue:#5580e0;
+  --serif:'Noto Serif SC',serif;--sans:'Noto Sans SC',sans-serif;--display:'ZCOOL XiaoWei',serif;
+}
+html{scroll-behavior:smooth;background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.7;font-size:16px}
+body{overflow-x:hidden}
+::selection{background:var(--accent);color:var(--bg)}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 32px;display:flex;align-items:center;justify-content:space-between;background:rgba(7,10,18,.88);backdrop-filter:blur(16px);border-bottom:1px solid rgba(126,184,224,.1)}
+nav .logo{font-family:var(--display);font-size:1.2rem;color:var(--accent);letter-spacing:.1em}
+nav ul{list-style:none;display:flex;gap:20px}
+nav ul a{color:var(--muted);text-decoration:none;font-size:.78rem;font-weight:500;letter-spacing:.04em;transition:color .25s}
+nav ul a:hover{color:var(--accent)}
+.nav-toggle{display:none;background:none;border:none;color:var(--accent);font-size:1.4rem;cursor:pointer}
+@media(max-width:900px){
+  nav ul{display:none;position:absolute;top:56px;left:0;right:0;background:rgba(7,10,18,.95);flex-direction:column;padding:20px 32px;gap:14px;border-bottom:1px solid rgba(126,184,224,.1)}
+  nav ul.open{display:flex}
+  .nav-toggle{display:block}
+}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;padding:80px 24px 60px;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 40% 30%,rgba(94,160,220,.07) 0%,transparent 55%),radial-gradient(ellipse at 65% 70%,rgba(200,164,92,.05) 0%,transparent 50%);pointer-events:none}
+.hero::after{content:'';position:absolute;top:50%;left:50%;width:700px;height:700px;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(126,184,224,.06) 0%,transparent 65%);pointer-events:none;animation:pulse 7s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.5;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.12)}}
+.hero-title{font-family:var(--display);font-size:clamp(2.8rem,8vw,6rem);color:var(--accent);letter-spacing:.15em;position:relative;z-index:1;text-shadow:0 0 50px rgba(126,184,224,.25)}
+.hero-sub{font-family:var(--serif);font-size:clamp(1rem,2.2vw,1.5rem);color:var(--muted);margin-top:12px;letter-spacing:.25em;position:relative;z-index:1}
+.hero-quote{font-size:.9rem;color:var(--dim);margin-top:28px;max-width:480px;position:relative;z-index:1;line-height:2;font-style:italic}
+.hero-stats{display:flex;gap:32px;margin-top:40px;position:relative;z-index:1;flex-wrap:wrap;justify-content:center}
+.hero-stat{text-align:center}
+.hero-stat .num{font-family:var(--serif);font-size:1.4rem;font-weight:700;color:var(--accent-b)}
+.hero-stat .label{font-size:.72rem;color:var(--dim);margin-top:2px;letter-spacing:.08em}
+.scroll-hint{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--dim);font-size:.68rem;letter-spacing:.1em;animation:float 2.5s ease-in-out infinite}
+.scroll-hint .arrow{width:16px;height:16px;border-right:1.5px solid var(--dim);border-bottom:1.5px solid var(--dim);transform:rotate(45deg)}
+@keyframes float{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
+
+/* SECTIONS */
+section{padding:100px 24px;max-width:1100px;margin:0 auto}
+.sec-title{font-family:var(--serif);font-size:clamp(1.5rem,3.5vw,2.2rem);font-weight:700;margin-bottom:8px;letter-spacing:.06em}
+.sec-title span{color:var(--accent)}
+.sec-line{width:48px;height:2px;background:var(--accent);margin-bottom:40px;border-radius:2px}
+.sec-desc{color:var(--muted);font-size:.9rem;margin-bottom:40px;max-width:640px;line-height:1.9}
+
+/* HIGHLIGHTS */
+.highlights{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px}
+.hl-card{background:var(--sf);border:1px solid rgba(255,255,255,.04);border-radius:14px;padding:28px 24px;transition:transform .3s,border-color .3s}
+.hl-card:hover{transform:translateY(-4px);border-color:rgba(126,184,224,.2)}
+.hl-icon{font-size:1.5rem;margin-bottom:14px;display:block}
+.hl-card h3{font-family:var(--serif);font-size:1rem;font-weight:700;margin-bottom:8px}
+.hl-card p{color:var(--muted);font-size:.8rem;line-height:1.8}
+
+/* COMPONENTS */
+.comp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px}
+.comp-card{background:var(--sf);border:1px solid rgba(255,255,255,.04);border-radius:14px;padding:24px;display:flex;gap:16px;align-items:flex-start}
+.comp-num{font-family:var(--serif);font-size:1.8rem;font-weight:900;color:var(--accent);line-height:1;flex-shrink:0;width:44px;text-align:center}
+.comp-card h4{font-size:.92rem;font-weight:700;margin-bottom:4px}
+.comp-card p{color:var(--muted);font-size:.78rem;line-height:1.7}
+
+/* DETAIL BLOCKS */
+.detail-block{margin-bottom:48px}
+.detail-block h3{font-family:var(--serif);font-size:1.1rem;font-weight:700;margin-bottom:16px;padding-left:14px;border-left:3px solid var(--accent)}
+.detail-block p,.detail-block li{color:var(--muted);font-size:.83rem;line-height:2}
+.detail-block ul{list-style:none;padding-left:0}
+.detail-block li{padding-left:16px;position:relative}
+.detail-block li::before{content:'';position:absolute;left:0;top:10px;width:6px;height:6px;background:var(--accent-d);border-radius:50%}
+.detail-block strong{color:var(--text)}
+.detail-block h4{font-size:.9rem;font-weight:700;color:var(--accent-b);margin:16px 0 8px}
+
+/* FLOW */
+.gp-flow{display:flex;gap:0;flex-wrap:wrap;justify-content:center;margin-bottom:48px}
+.gp-step{flex:1;min-width:180px;max-width:240px;background:var(--sf);border:1px solid rgba(255,255,255,.04);border-radius:12px;padding:24px 20px;position:relative;text-align:center}
+.gp-step::after{content:'→';position:absolute;right:-12px;top:50%;transform:translateY(-50%);color:var(--accent-d);font-size:1.1rem;font-weight:700}
+.gp-step:last-child::after{display:none}
+.gp-step-num{font-family:var(--serif);font-size:.65rem;color:var(--accent);letter-spacing:.15em;margin-bottom:8px}
+.gp-step h4{font-family:var(--serif);font-size:1rem;font-weight:700;margin-bottom:8px}
+.gp-step p{color:var(--muted);font-size:.75rem;line-height:1.8}
+@media(max-width:600px){.gp-flow{flex-direction:column;align-items:center}.gp-step::after{display:none}.gp-step{max-width:100%}}
+
+/* KEYWORD GRID */
+.kw-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:16px}
+.kw-card{background:var(--sf);border:1px solid rgba(255,255,255,.04);border-radius:10px;padding:18px}
+.kw-card h4{font-size:.85rem;font-weight:700;color:var(--accent-b);margin-bottom:5px}
+.kw-card p{color:var(--muted);font-size:.76rem;line-height:1.8}
+
+/* ZONE CARDS */
+.zone-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-top:20px}
+.zone-card{background:var(--sf);border:1px solid rgba(255,255,255,.04);border-radius:14px;padding:28px 24px;position:relative;overflow:hidden}
+.zone-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.zone-card:nth-child(1)::before{background:linear-gradient(90deg,var(--gold),var(--gold-b))}
+.zone-card:nth-child(2)::before{background:linear-gradient(90deg,var(--accent),var(--accent-b))}
+.zone-card:nth-child(3)::before{background:linear-gradient(90deg,var(--red),#f0a0a0)}
+.zone-card h3{font-family:var(--serif);font-size:1.05rem;font-weight:700;margin-bottom:10px}
+.zone-card p{color:var(--muted);font-size:.8rem;line-height:1.9}
+
+/* DAMAGE FLOW */
+.dmg-flow{display:flex;align-items:center;gap:0;flex-wrap:wrap;justify-content:center;margin:16px 0 28px}
+.dmg-step{background:var(--el);border:1px solid rgba(255,255,255,.06);padding:10px 16px;border-radius:8px;font-size:.75rem;color:var(--muted);text-align:center;white-space:nowrap}
+.dmg-arrow{color:var(--accent-d);padding:0 5px;font-size:.85rem}
+
+/* MAP INFO */
+.map-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:20px}
+.map-card{background:var(--sf);border:1px solid rgba(255,255,255,.04);border-radius:12px;padding:22px}
+.map-card h4{font-size:.88rem;font-weight:700;color:var(--accent-b);margin-bottom:6px}
+.map-card p{color:var(--muted);font-size:.78rem;line-height:1.8}
+
+/* CARD TYPE COLORS */
+.ct-basic{color:var(--gold-b)}
+.ct-skill{color:var(--accent-b)}
+.ct-equip{color:var(--red)}
+
+/* MODE GRID */
+.mode-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.mode-card{background:var(--sf);border:1px solid rgba(255,255,255,.04);border-radius:14px;padding:28px 24px;position:relative;overflow:hidden}
+.mode-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.mode-card:nth-child(1)::before{background:linear-gradient(90deg,var(--gold),var(--accent))}
+.mode-card:nth-child(2)::before{background:linear-gradient(90deg,var(--accent),var(--accent-b))}
+.mode-card:nth-child(3)::before{background:linear-gradient(90deg,var(--red),var(--gold))}
+.mode-card:nth-child(4)::before{background:linear-gradient(90deg,#8b5cf6,var(--accent))}
+.mode-card:nth-child(5)::before{background:linear-gradient(90deg,var(--gold-b),var(--red))}
+.mode-card:nth-child(6)::before{background:linear-gradient(90deg,var(--accent-d),#8b5cf6)}
+.mode-card h3{font-family:var(--serif);font-size:1.05rem;font-weight:700;margin-bottom:4px}
+.mode-card .mode-tag{font-size:.68rem;color:var(--accent);letter-spacing:.1em;margin-bottom:10px;display:block}
+.mode-card p{color:var(--muted);font-size:.78rem;line-height:1.9}
+.mode-card .mode-rules{margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.06)}
+.mode-card .mode-rules p{font-size:.75rem;color:var(--dim)}
+
+/* DIVIDER */
+.divider{height:1px;background:linear-gradient(90deg,transparent,rgba(126,184,224,.2),transparent);margin:0;max-width:1100px;margin-left:auto;margin-right:auto}
+
+/* CTA */
+.cta-section{text-align:center;padding:80px 24px 60px}
+.cta-section h2{font-family:var(--display);font-size:clamp(1.6rem,3.5vw,2.5rem);color:var(--accent);margin-bottom:14px;letter-spacing:.1em}
+.cta-section p{color:var(--muted);font-size:.9rem;margin-bottom:32px;max-width:460px;margin-left:auto;margin-right:auto;line-height:1.9}
+.cta-btn{display:inline-block;padding:12px 44px;background:linear-gradient(135deg,var(--accent-d),var(--accent));color:var(--bg);font-family:var(--serif);font-size:.95rem;font-weight:700;border-radius:8px;text-decoration:none;letter-spacing:.1em;transition:transform .25s,box-shadow .25s}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(126,184,224,.25)}
+footer{text-align:center;padding:28px 24px;color:var(--dim);font-size:.68rem;border-top:1px solid rgba(255,255,255,.04)}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* CHARACTER CARDS */
+.char-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:28px}
+.char-pair{display:flex;gap:12px;align-items:flex-start;position:relative}
+.char-card-wrap{flex:1;text-align:center}
+.char-card-wrap .card-face{aspect-ratio:63/88;border-radius:10px;overflow:hidden;transition:transform .35s cubic-bezier(.22,1,.36,1),box-shadow .35s}
+.char-card-wrap .card-face:hover{transform:translateY(-6px) scale(1.03);box-shadow:0 12px 36px rgba(0,0,0,.4)}
+.char-card-wrap .card-face img{width:100%;height:100%;object-fit:cover;display:block}
+.char-card-wrap .card-name{margin-top:8px;font-size:.75rem;font-weight:700;color:var(--text)}
+.char-label{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:.7rem;color:var(--dim);letter-spacing:.08em;white-space:nowrap}
+.char-pair{padding-bottom:24px}
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">天幻凌霄</div>
+  <button class="nav-toggle" onclick="document.querySelector('nav ul').classList.toggle('open')">☰</button>
+  <ul>
+    <li><a href="#intro">游戏介绍</a></li>
+    <li><a href="#components">游戏配件</a></li>
+    <li><a href="#map">游戏地图</a></li>
+    <li><a href="#cards">指令卡</a></li>
+    <li><a href="#zones">放置区域</a></li>
+    <li><a href="#gameplay">核心玩法</a></li>
+    <li><a href="#rules">详细规则</a></li>
+    <li><a href="#characters">角色卡</a></li>
+    <li><a href="#modes">游戏模式</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <h1 class="hero-title">天幻凌霄</h1>
+  <p class="hero-sub">卡牌版图 · 策略对战</p>
+  <p class="hero-quote">"幻想有那么一个世界，有着关于梦想与生活的故事。"<br>——这是属于每个人独一无二的幸福。</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="num">2-4</div><div class="label">游戏人数</div></div>
+    <div class="hero-stat"><div class="num">12+</div><div class="label">适合年龄</div></div>
+    <div class="hero-stat"><div class="num">15-30</div><div class="label">分钟/局</div></div>
+    <div class="hero-stat"><div class="num">6种</div><div class="label">游戏模式</div></div>
+  </div>
+  <div class="scroll-hint"><span>向下滚动</span><div class="arrow"></div></div>
+</section>
+
+<div class="divider"></div>
+
+<!-- INTRO -->
+<section id="intro">
+  <div class="reveal">
+    <h2 class="sec-title">游戏<span>介绍</span></h2>
+    <div class="sec-line"></div>
+  </div>
+  <div class="detail-block reveal">
+    <p>《天幻凌霄》是一款卡牌驱动的版图对战游戏。玩家们在六边形版图上操控角色，利用指令卡进行攻击、防御、移动和策略博弈。独特的<strong>放置区域</strong>机制和<strong>充能系统</strong>让每一局都充满深度与变化。</p>
+    <p style="margin-top:16px">游戏融合了卡牌构筑、位置博弈和资源管理，既有即时的战术对抗，也有长线的战略规划。六种不同的游戏模式满足不同人数和风格的需求。</p>
+  </div>
+
+  <div class="highlights">
+    <div class="hl-card reveal">
+      <span class="hl-icon">🗺️</span>
+      <h3>六边形版图</h3>
+      <p>位置决定攻防距离，中心+2攻击，点数位+2防御，字母位锁定为3。地形就是你的武器。</p>
+    </div>
+    <div class="hl-card reveal">
+      <span class="hl-icon">📦</span>
+      <h3>三大放置区域</h3>
+      <p>储备区隐藏手牌、充能区蓄力大招、加成区叠加增益——区域管理是胜利的关键。</p>
+    </div>
+    <div class="hl-card reveal">
+      <span class="hl-icon">🃏</span>
+      <h3>丰富的指令体系</h3>
+      <p>A~K点数、红黑双色、四种花色。基础/技能/礼装三大类指令卡，组合无穷。</p>
+    </div>
+    <div class="hl-card reveal">
+      <span class="hl-icon">⚡</span>
+      <h3>充能爆发</h3>
+      <p>将技能卡放入充能区，每回合产出晶体。充能完毕后一键爆发，不再消耗魔力！</p>
+    </div>
+    <div class="hl-card reveal">
+      <span class="hl-icon">🔄</span>
+      <h3>切换角色</h3>
+      <p>战斗中可切换角色，灵活应对局势变化。备战角色为你提供更多战术选择。</p>
+    </div>
+    <div class="hl-card reveal">
+      <span class="hl-icon">🎮</span>
+      <h3>六种游戏模式</h3>
+      <p>单挑、乱斗、组队、数据流失、星河灿烂、无限乱斗、粒子通道——总有一种适合你。</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- COMPONENTS -->
+<section id="components">
+  <div class="reveal">
+    <h2 class="sec-title">游戏<span>配件</span></h2>
+    <div class="sec-line"></div>
+  </div>
+  <div class="comp-grid">
+    <div class="comp-card reveal">
+      <div class="comp-num">Ⅰ</div>
+      <div>
+        <h4>游戏地图</h4>
+        <p>六边形版图，每个节点是一个位置。相邻两点距离为一，中心位攻击+2，点数位防御+2，字母位攻防锁定为3。</p>
+      </div>
+    </div>
+    <div class="comp-card reveal">
+      <div class="comp-num">Ⅱ</div>
+      <div>
+        <h4>游戏面板</h4>
+        <p>放置卡牌、装备礼装、运行机制和显示数值。每位玩家面前各一张。</p>
+      </div>
+    </div>
+    <div class="comp-card reveal">
+      <div class="comp-num">Ⅲ</div>
+      <div>
+        <h4>指示物</h4>
+        <p>角色指示物（标记位置）、血量指示物、魔力指示物。通用指示物也可用作晶体。</p>
+      </div>
+    </div>
+    <div class="comp-card reveal">
+      <div class="comp-num">Ⅳ</div>
+      <div>
+        <h4>角色卡</h4>
+        <p>主动/被动技能。初始指令/血量/魔力/上限均为6，攻击/移动次数和攻防距离均为1。</p>
+      </div>
+    </div>
+    <div class="comp-card reveal">
+      <div class="comp-num">Ⅴ</div>
+      <div>
+        <h4>指令卡</h4>
+        <p>A~K点数、红黑双色、四种花色。分为基础指令、技能指令和礼装指令三大类。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- MAP -->
+<section id="map">
+  <div class="reveal">
+    <h2 class="sec-title">游戏<span>地图</span></h2>
+    <div class="sec-line"></div>
+    <p class="sec-desc">六边形版图，每个节点都是一个战术位置。掌握地形优势，就是掌握胜利的钥匙。</p>
+  </div>
+
+  <div class="map-grid reveal">
+    <div class="map-card">
+      <h4>🗺️ 基础规则</h4>
+      <p>每个节点都是一个位置，相邻两点间的距离为一。计算距离时应计算<strong>最短距离</strong>。</p>
+    </div>
+    <div class="map-card">
+      <h4>🎯 中心位置</h4>
+      <p>位于<strong>中心位置</strong>的角色，<strong>攻击距离额外+2</strong>。掌握中心就是掌握进攻主动权。</p>
+    </div>
+    <div class="map-card">
+      <h4>🛡️ 点数位置</h4>
+      <p>位于<strong>点数位置</strong>的角色，<strong>防御距离额外+2</strong>。适合防守反击的战术。</p>
+    </div>
+    <div class="map-card">
+      <h4>🔤 字母位置</h4>
+      <p>位于<strong>字母位置</strong>的角色，攻击和防御距离<strong>锁定为3</strong>。攻守兼备的特殊地形。</p>
+    </div>
+  </div>
+
+  <div class="detail-block reveal" style="margin-top:32px">
+    <h3>位置变动机制</h3>
+    <ul>
+      <li><strong>移动</strong>：将角色指示物挪动一定距离，路径上<strong>无法</strong>通过其他角色</li>
+      <li><strong>位移</strong>：将角色指示物挪动一定距离，路径上<strong>可以</strong>通过其他角色</li>
+      <li><strong>击飞</strong>：将角色指示物挪动一定距离，路径上<strong>无法</strong>通过其他角色</li>
+      <li><strong>传送</strong>：将角色指示物<strong>直接</strong>挪动到任意位置</li>
+    </ul>
+    <p style="margin-top:12px">⚠️ 角色位置变动后<strong>不能</strong>与其他角色位于同一位置。</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CARDS -->
+<section id="cards">
+  <div class="reveal">
+    <h2 class="sec-title"><span>指令</span>卡体系</h2>
+    <div class="sec-line"></div>
+    <p class="sec-desc">A~K点数、红黑双色、四种花色（黑桃/梅花/红桃/方片），三大类指令卡构建丰富的策略空间。</p>
+  </div>
+
+  <!-- Card Types -->
+  <div class="detail-block reveal">
+    <h3>指令卡种类</h3>
+    <div class="kw-grid">
+      <div class="kw-card">
+        <h4 class="ct-basic">基础指令</h4>
+        <p><strong>攻击</strong>、<strong>防御</strong>、<strong>星芒</strong>和<strong>移动</strong>四种。构成战斗的基本手段。</p>
+      </div>
+      <div class="kw-card">
+        <h4 class="ct-skill">技能指令</h4>
+        <p>分为<strong>特殊技能</strong>和<strong>效果技能</strong>。等级E~S，消耗0~5魔力。</p>
+      </div>
+      <div class="kw-card">
+        <h4 class="ct-equip">礼装指令</h4>
+        <p>每人至多装备一件。可在行动阶段<strong>装备</strong>、<strong>更换</strong>或<strong>重置</strong>礼装。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Skill Levels -->
+  <div class="detail-block reveal">
+    <h3>技能等级与消耗</h3>
+    <div class="kw-grid">
+      <div class="kw-card"><h4>E级</h4><p>消耗 0 魔力</p></div>
+      <div class="kw-card"><h4>D级</h4><p>消耗 1 魔力</p></div>
+      <div class="kw-card"><h4>C级</h4><p>消耗 2 魔力</p></div>
+      <div class="kw-card"><h4>B级</h4><p>消耗 3 魔力</p></div>
+      <div class="kw-card"><h4>A级</h4><p>消耗 4 魔力</p></div>
+      <div class="kw-card"><h4>S级</h4><p>消耗 5 魔力</p></div>
+    </div>
+  </div>
+
+  <!-- Keywords -->
+  <div class="detail-block reveal">
+    <h3>指令卡关键词</h3>
+    <div class="kw-grid">
+      <div class="kw-card"><h4>使用</h4><p>发动指令卡的效果。</p></div>
+      <div class="kw-card"><h4>弃置</h4><p>不发动指令卡的效果。</p></div>
+      <div class="kw-card"><h4>补给</h4><p>获得牌堆顶部X张指令卡。</p></div>
+      <div class="kw-card"><h4>收回</h4><p>将指令卡收回到玩家手中。</p></div>
+      <div class="kw-card"><h4>重置</h4><p>将X张指令卡置于弃牌堆顶部，然后补给X张指令卡。</p></div>
+      <div class="kw-card"><h4>亮出</h4><p>明牌，手中亮出的指令卡会一直亮出。</p></div>
+      <div class="kw-card"><h4>放置</h4><p>将指令卡放置到某个区域。</p></div>
+      <div class="kw-card"><h4>判定</h4><p>展示牌堆顶部X张指令卡，展示的卡即为判定结果。</p></div>
+    </div>
+  </div>
+
+  <!-- Resolution -->
+  <div class="detail-block reveal">
+    <h3>指令卡结算顺序</h3>
+    <div class="dmg-flow">
+      <div class="dmg-step">使用时</div>
+      <div class="dmg-arrow">→</div>
+      <div class="dmg-step">使用成功/失败后</div>
+      <div class="dmg-arrow">→</div>
+      <div class="dmg-step">指定时</div>
+      <div class="dmg-arrow">→</div>
+      <div class="dmg-step">被指定时</div>
+      <div class="dmg-arrow">→</div>
+      <div class="dmg-step">被指定后</div>
+      <div class="dmg-arrow">→</div>
+      <div class="dmg-step">使用后</div>
+    </div>
+    <p>使用、弃置或判定指令卡后，将其置于弃牌堆顶部。</p>
+  </div>
+
+  <!-- Card Management -->
+  <div class="detail-block reveal">
+    <h3>牌堆与弃牌堆</h3>
+    <ul>
+      <li>牌堆的指令卡始终<strong>背面朝上</strong></li>
+      <li>弃牌堆的指令卡始终<strong>正面朝上</strong></li>
+      <li>当牌堆归零后，混洗弃牌堆并刷新为牌堆</li>
+    </ul>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ZONES -->
+<section id="zones">
+  <div class="reveal">
+    <h2 class="sec-title"><span>放置</span>区域</h2>
+    <div class="sec-line"></div>
+    <p class="sec-desc">三大放置区域各有独特机制。放置卡≠指令卡且不计入指令上限，但在使用时＝指令卡。放置后无法收回手中。</p>
+  </div>
+
+  <div class="zone-grid">
+    <div class="zone-card reveal">
+      <h3>📦 储备区域</h3>
+      <p>
+        <strong>储备上限：</strong>1张<br><br>
+        · 将<strong>任意指令</strong>背面朝上放置为<strong>储备卡</strong><br>
+        · 储备卡对你<strong>可见</strong>，无法被其他玩家查看、亮出、获得和弃置<br>
+        · 你可以使用你的储备卡<br><br>
+        <em style="color:var(--dim)">💡 隐藏关键手牌，出其不意！</em>
+      </p>
+    </div>
+    <div class="zone-card reveal">
+      <h3>⚡ 充能区域</h3>
+      <p>
+        <strong>充能上限：</strong>1张<br><br>
+        · 将<strong>技能指令</strong>正面朝上放置为<strong>充能卡</strong><br>
+        · 回合结束后，充能卡产出<strong>1个晶体</strong><br>
+        · 充能完成所需晶体：E级0/D级1/C级2/B级3/A级4/S级5<br>
+        · 充能完成后，<strong>消耗所有晶体</strong>即可使用（不再消耗魔力）<br>
+        · E级卡直接充能完成<br><br>
+        <em style="color:var(--dim)">💡 蓄力大招，一击必杀！</em>
+      </p>
+    </div>
+    <div class="zone-card reveal">
+      <h3>🗡️ 加成区域</h3>
+      <p>
+        <strong>加成上限：</strong>6张<br><br>
+        · 将<strong>基础指令</strong>正面朝上放置为<strong>加成卡</strong><br>
+        · 每张攻击指令：攻击距离和攻击次数<strong>+1</strong><br>
+        · 每张防御指令：防御距离和指令上限<strong>+1</strong><br>
+        · 每张移动指令：移动速度<strong>+1</strong><br>
+        · 存有星芒指令：<strong>无法受到伤害</strong><br><br>
+        ⚠️ 回合开始后，<strong>弃置所有加成卡</strong><br><br>
+        <em style="color:var(--dim)">💡 回合内爆发，回合结束归零！</em>
+      </p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- GAMEPLAY -->
+<section id="gameplay">
+  <div class="reveal">
+    <h2 class="sec-title">核心<span>玩法</span></h2>
+    <div class="sec-line"></div>
+  </div>
+
+  <!-- Game Start -->
+  <div class="detail-block reveal">
+    <h3>游戏开始前</h3>
+    <ul>
+      <li>放置游戏地图，所有玩家面前放置游戏面板，混洗各类卡牌</li>
+      <li>抽取顺序卡（2人抽AB，4人抽ABCD），回合顺序按A→B→C→D进行</li>
+      <li>AD为同一队伍，BC为同一队伍</li>
+      <li>各抽取3张角色卡选1张使用，另外2张放回</li>
+      <li>将角色指示物置于顺序卡对应位置</li>
+      <li>按ABCD顺序依次获得6张指令卡（初始指令）</li>
+    </ul>
+  </div>
+
+  <!-- Turn Flow -->
+  <div class="reveal">
+    <h3 class="sec-title" style="font-size:1.1rem;margin-bottom:20px">回合<span>流程</span></h3>
+  </div>
+  <div class="gp-flow reveal">
+    <div class="gp-step">
+      <div class="gp-step-num">PHASE 01</div>
+      <h4>补给阶段</h4>
+      <p>根据当前轮次补给指令卡：<br>第1轮：<strong>1张</strong><br>第2~5轮：<strong>2张</strong><br>第6轮+：<strong>3张</strong></p>
+    </div>
+    <div class="gp-step">
+      <div class="gp-step-num">PHASE 02</div>
+      <h4>行动阶段</h4>
+      <p>刷新攻击/移动次数。可执行：<br>①使用指令卡<br>②发动角色技能<br>③消耗移动次数移动</p>
+    </div>
+    <div class="gp-step">
+      <div class="gp-step-num">PHASE 03</div>
+      <h4>休整阶段</h4>
+      <p>将指令卡弃置至≤指令上限（默认6）。</p>
+    </div>
+    <div class="gp-step">
+      <div class="gp-step-num">END</div>
+      <h4>回合结束</h4>
+      <p>所有角色恢复<strong>2点魔力</strong>，下一位玩家回合开始。</p>
+    </div>
+  </div>
+
+  <!-- Turn Order -->
+  <div class="detail-block reveal">
+    <h3>回合顺序</h3>
+    <ul>
+      <li>默认从起始玩家开始按<strong>逆时针</strong>顺序依次进行回合</li>
+      <li>在默认基础上，玩家按<strong>移动速度从大到小</strong>的顺序依次进行回合</li>
+    </ul>
+  </div>
+
+  <!-- Damage -->
+  <div class="detail-block reveal">
+    <h3>伤害结算</h3>
+    <div class="dmg-flow">
+      <div class="dmg-step">造成伤害时</div>
+      <div class="dmg-arrow">→</div>
+      <div class="dmg-step">受到伤害时</div>
+      <div class="dmg-arrow">→</div>
+      <div class="dmg-step">造成伤害后</div>
+      <div class="dmg-arrow">→</div>
+      <div class="dmg-step">受到伤害后</div>
+    </div>
+    <ul>
+      <li>当你受到伤害时，若伤害<strong>≥血量</strong>则为<strong>致死伤害</strong></li>
+      <li>若伤害<strong>小于一</strong>则结束伤害结算</li>
+    </ul>
+  </div>
+
+  <!-- Exit -->
+  <div class="detail-block reveal">
+    <h3>退出游戏</h3>
+    <ul>
+      <li>当角色血量变动为<strong>小于1</strong>后，若未能恢复至大于零，则退出游戏</li>
+      <li>退出时弃置所有指令卡并将角色指示物放回</li>
+      <li>击败该角色的玩家<strong>补给1张指令卡</strong></li>
+    </ul>
+  </div>
+
+  <!-- Targeting -->
+  <div class="detail-block reveal">
+    <h3>指定机制</h3>
+    <p>当你被指定时，若你<strong>脱离了指定距离或范围</strong>则使你<strong>免去指定</strong>。利用地形和移动来躲避敌方的锁定！</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- DETAILED RULES -->
+<section id="rules">
+  <div class="reveal">
+    <h2 class="sec-title">详细<span>规则</span></h2>
+    <div class="sec-line"></div>
+  </div>
+
+  <!-- Character Stats -->
+  <div class="detail-block reveal">
+    <h3>角色默认数值</h3>
+    <div class="kw-grid">
+      <div class="kw-card"><h4>初始指令</h4><p>6张</p></div>
+      <div class="kw-card"><h4>初始血量</h4><p>6点</p></div>
+      <div class="kw-card"><h4>初始魔力</h4><p>6点</p></div>
+      <div class="kw-card"><h4>指令上限</h4><p>6张</p></div>
+      <div class="kw-card"><h4>血量上限</h4><p>6点</p></div>
+      <div class="kw-card"><h4>魔力上限</h4><p>6点</p></div>
+      <div class="kw-card"><h4>攻击次数</h4><p>1次</p></div>
+      <div class="kw-card"><h4>移动次数</h4><p>1次</p></div>
+      <div class="kw-card"><h4>攻击距离</h4><p>1</p></div>
+      <div class="kw-card"><h4>防御距离</h4><p>1</p></div>
+      <div class="kw-card"><h4>移动速度</h4><p>1</p></div>
+    </div>
+  </div>
+
+  <!-- Glossary -->
+  <div class="detail-block reveal">
+    <h3>游戏名词</h3>
+    <div class="kw-grid">
+      <div class="kw-card"><h4>友方角色</h4><p>你和与你同一队伍的角色。</p></div>
+      <div class="kw-card"><h4>敌方角色</h4><p>与你不在同一队伍的角色。</p></div>
+      <div class="kw-card"><h4>其他角色</h4><p>你的友方角色和敌方角色。</p></div>
+      <div class="kw-card"><h4>任意角色</h4><p>你、友方角色和敌方角色。</p></div>
+    </div>
+  </div>
+
+  <!-- Transform -->
+  <div class="detail-block reveal">
+    <h3>转化机制：当做与视为</h3>
+    <div class="kw-grid">
+      <div class="kw-card">
+        <h4>当做</h4>
+        <p>将A指令卡<strong>当做</strong>B指令卡。继承A的花色和点数，但名称、消耗和效果改为B。</p>
+      </div>
+      <div class="kw-card">
+        <h4>视为</h4>
+        <p><strong>无</strong>颜色、花色、点数、消耗和实体卡。纯粹的效果触发。</p>
+      </div>
+    </div>
+    <p style="margin-top:12px">💡 当做和视为的指令卡<strong>可以触发技能</strong>。例：技能为"使用攻击指令后恢复1魔力"，当做/视为使用攻击指令仍可触发。</p>
+  </div>
+
+  <!-- HP Change -->
+  <div class="detail-block reveal">
+    <h3>血量变动</h3>
+    <div class="kw-grid">
+      <div class="kw-card">
+        <h4>增加血量</h4>
+        <p>包含但不等于恢复血量。</p>
+      </div>
+      <div class="kw-card">
+        <h4>减少血量</h4>
+        <p>包含但不等于受到伤害。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Suit Mechanism -->
+  <div class="detail-block reveal">
+    <h3>切换角色机制</h3>
+    <div class="kw-grid">
+      <div class="kw-card">
+        <h4>切换角色 Ⅰ</h4>
+        <p>抽取3张角色卡选1张使用，另外2张放回。<br>· 每个行动阶段限1次<br>· 血量变动后若血量>0也可切换<br><em style="color:var(--dim)">仅切换角色卡，其它不变。</em></p>
+      </div>
+      <div class="kw-card">
+        <h4>切换角色 Ⅱ</h4>
+        <p>将备战角色切换为首发，原首发切换为备战。<br>· 每人3张角色卡：1首发+2备战<br>· 每个行动阶段限1次<br>· 血量变动后若血量>0也可切换</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- GAME MODES -->
+<section id="modes">
+  <div class="reveal">
+    <h2 class="sec-title">游戏<span>模式</span></h2>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="mode-grid">
+    <div class="mode-card reveal">
+      <h3>⚔️ 单挑玩法</h3>
+      <span class="mode-tag">2 PLAYERS</span>
+      <p>一对一正面对决。<br><strong>胜利：</strong>敌方角色退出游戏。<br><strong>失败：</strong>你的角色退出游戏。</p>
+    </div>
+    <div class="mode-card reveal">
+      <h3>🔥 乱斗玩法</h3>
+      <span class="mode-tag">3-4 PLAYERS · 自由对战</span>
+      <p>所有人各自为战。<br><strong>胜利：</strong>场上只剩你的角色。<br><strong>失败：</strong>你的角色退出游戏。</p>
+    </div>
+    <div class="mode-card reveal">
+      <h3>🤝 组队玩法</h3>
+      <span class="mode-tag">4 PLAYERS · 2v2</span>
+      <p>AD队伍 vs BC队伍。<br><strong>胜利：</strong>所有敌方角色退出游戏。<br><strong>失败：</strong>所有友方角色退出游戏。</p>
+    </div>
+    <div class="mode-card reveal">
+      <h3>💀 玩法Ⅰ：数据流失</h3>
+      <span class="mode-tag">2-4 PLAYERS · 生存模式</span>
+      <p>
+        <strong>胜利：</strong>场上只剩你的角色。<br><br>
+        · 奇数轮：判定2张卡生成<strong>补给包</strong><br>
+        · 偶数轮：判定1张卡，对应位置及相邻角色<strong>-1血量</strong><br>
+        · 踩到补给包获得1张礼装卡<br>
+        · 第3/6/9轮：特定区域变为<strong>信息流失区域</strong>，每轮-1血量
+      </p>
+    </div>
+    <div class="mode-card reveal">
+      <h3>✨ 玩法Ⅱ：星河灿烂</h3>
+      <span class="mode-tag">2-4 PLAYERS · 领地控制</span>
+      <p>
+        <strong>胜利：</strong>场上只剩你的角色。<br><br>
+        · 回合开始：相邻空闲位置放置<strong>星棋</strong>，无空闲位则-1血量<br>
+        · 行动阶段限1次：击飞相邻星棋<br>
+        · 攻击指令可指定星棋（直接清除）<br>
+        · 防御指令可击飞星棋<br>
+        · 路径上无法通过星棋<br>
+        · 地图边缘角色每轮-1血量
+      </p>
+    </div>
+    <div class="mode-card reveal">
+      <h3>🌀 玩法Ⅲ：无限乱斗</h3>
+      <span class="mode-tag">2-6 PLAYERS · 轮回复活</span>
+      <p>
+        <strong>游戏结束：</strong>轮次>12轮且有人达成胜利条件。<br>
+        <strong>胜利：</strong>拥有最多星棋。<br><br>
+        · 开局获得3个星棋<br>
+        · 击败对手获得其1个星棋<br>
+        · 下一轮开始时对手复活（满血满魔力+初始指令）<br>
+        · 支持切换角色机制
+      </p>
+    </div>
+    <div class="mode-card reveal">
+      <h3>🌟 玩法Ⅳ：粒子通道</h3>
+      <span class="mode-tag">4 PLAYERS · 2v2 非对称</span>
+      <p>
+        <strong>唤星者（1/2号位）：</strong>击败所有修复者 或 第12轮结束。<br>
+        <strong>修复者（3/4号位）：</strong>击败所有唤星者 或 所有修复者通过粒子通道。<br><br>
+        · 奇数轮：唤星者各抽取1张道具卡<br>
+        · 偶数轮：修复者各抽取1张道具卡<br>
+        · 第8/10轮：判定或掷12面骰生成<strong>粒子通道</strong>
+      </p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+
+<div class="divider"></div>
+
+<section id="characters">
+  <div class="reveal">
+    <h2 class="sec-title"><span>角色</span>卡一览</h2>
+    <div class="sec-line"></div>
+    <p class="sec-desc">47位角色，每位拥有初始形态和觉醒形态（A级）。包含主线角色、联动角色（LD）和联盟角色。选择你的角色，开启属于你的天幻凌霄之旅。</p>
+  </div>
+  <div class="char-grid">
+    
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/001b.webp" alt="蓝色星陨"></div>
+        <div class="card-name">蓝色星陨</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/001a.webp" alt="天幻剑耀"></div>
+        <div class="card-name" style="color:var(--accent-b)">天幻剑耀</div>
+      </div>
+      <div class="char-label">新泽</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/002b.webp" alt="玫瑰礼炮"></div>
+        <div class="card-name">玫瑰礼炮</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/002a.webp" alt="童话世界"></div>
+        <div class="card-name" style="color:var(--accent-b)">童话世界</div>
+      </div>
+      <div class="char-label">相月七</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/003b.webp" alt="魔女之拥"></div>
+        <div class="card-name">魔女之拥</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/003a.webp" alt="璀璨火花"></div>
+        <div class="card-name" style="color:var(--accent-b)">璀璨火花</div>
+      </div>
+      <div class="char-label">火花兰</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/004b.webp" alt="蓝色蔷薇"></div>
+        <div class="card-name">蓝色蔷薇</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/004a.webp" alt="极地蔷薇"></div>
+        <div class="card-name" style="color:var(--accent-b)">极地蔷薇</div>
+      </div>
+      <div class="char-label">艾薇儿</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/005b.webp" alt="命运之星"></div>
+        <div class="card-name">命运之星</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/005a.webp" alt="命运之门"></div>
+        <div class="card-name" style="color:var(--accent-b)">命运之门</div>
+      </div>
+      <div class="char-label">東昊</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/006b.webp" alt="海洋之心"></div>
+        <div class="card-name">海洋之心</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/006a.webp" alt="海的图腾"></div>
+        <div class="card-name" style="color:var(--accent-b)">海的图腾</div>
+      </div>
+      <div class="char-label">露西亚</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/007b.webp" alt="星幕繁花"></div>
+        <div class="card-name">星幕繁花</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/007a.webp" alt="花神礼赞"></div>
+        <div class="card-name" style="color:var(--accent-b)">花神礼赞</div>
+      </div>
+      <div class="char-label">芙洛拉</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/008b.webp" alt="碧落潮汐"></div>
+        <div class="card-name">碧落潮汐</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/008a.webp" alt="水的温柔"></div>
+        <div class="card-name" style="color:var(--accent-b)">水的温柔</div>
+      </div>
+      <div class="char-label">古汐</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/009b.webp" alt="星芒闪烁"></div>
+        <div class="card-name">星芒闪烁</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/009a.webp" alt="星光汇聚"></div>
+        <div class="card-name" style="color:var(--accent-b)">星光汇聚</div>
+      </div>
+      <div class="char-label">古飒</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/010b.webp" alt="夏日的大三角"></div>
+        <div class="card-name">夏日的大三角</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/010a.webp" alt="平川定海"></div>
+        <div class="card-name" style="color:var(--accent-b)">平川定海</div>
+      </div>
+      <div class="char-label">诗乃</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/011b.webp" alt="凤凰之舞"></div>
+        <div class="card-name">凤凰之舞</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/011a.webp" alt="凤凰之焱"></div>
+        <div class="card-name" style="color:var(--accent-b)">凤凰之焱</div>
+      </div>
+      <div class="char-label">古煌</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/012b.webp" alt="时光旅行"></div>
+        <div class="card-name">时光旅行</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/012a.webp" alt="时光跳跃"></div>
+        <div class="card-name" style="color:var(--accent-b)">时光跳跃</div>
+      </div>
+      <div class="char-label">新钟静雯</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/013b.webp" alt="时间长河"></div>
+        <div class="card-name">时间长河</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/013a.webp" alt="浮生未歇"></div>
+        <div class="card-name" style="color:var(--accent-b)">浮生未歇</div>
+      </div>
+      <div class="char-label">古夜</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/014b.webp" alt="我的愿望"></div>
+        <div class="card-name">我的愿望</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/014a.webp" alt="祈愿之星"></div>
+        <div class="card-name" style="color:var(--accent-b)">祈愿之星</div>
+      </div>
+      <div class="char-label">祝如愿</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/015b.webp" alt="我的愿望"></div>
+        <div class="card-name">我的愿望</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/015a.webp" alt="祈愿之星"></div>
+        <div class="card-name" style="color:var(--accent-b)">祈愿之星</div>
+      </div>
+      <div class="char-label">新祝如愿</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/016b.webp" alt="夏天的风"></div>
+        <div class="card-name">夏天的风</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/016a.webp" alt="魔法少女"></div>
+        <div class="card-name" style="color:var(--accent-b)">魔法少女</div>
+      </div>
+      <div class="char-label">柠檬</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/017b.webp" alt="夏天的风"></div>
+        <div class="card-name">夏天的风</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/017a.webp" alt="魔法少女"></div>
+        <div class="card-name" style="color:var(--accent-b)">魔法少女</div>
+      </div>
+      <div class="char-label">新柠檬</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/018b.webp" alt="逐浪之花"></div>
+        <div class="card-name">逐浪之花</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/018a.webp" alt="幻海之心"></div>
+        <div class="card-name" style="color:var(--accent-b)">幻海之心</div>
+      </div>
+      <div class="char-label">阿绫</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/019b.webp" alt="逐浪之花"></div>
+        <div class="card-name">逐浪之花</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/019a.webp" alt="幻海之心"></div>
+        <div class="card-name" style="color:var(--accent-b)">幻海之心</div>
+      </div>
+      <div class="char-label">新阿绫</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/020b.webp" alt="夜莺之歌"></div>
+        <div class="card-name">夜莺之歌</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/020a.webp" alt="夜莺之歌·A"></div>
+        <div class="card-name" style="color:var(--accent-b)">夜莺之歌·A</div>
+      </div>
+      <div class="char-label">夜翎歌</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/021b.webp" alt="万物本源"></div>
+        <div class="card-name">万物本源</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/021a.webp" alt="天命殊途"></div>
+        <div class="card-name" style="color:var(--accent-b)">天命殊途</div>
+      </div>
+      <div class="char-label">淏霖</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/022b.webp" alt="星辰风暴"></div>
+        <div class="card-name">星辰风暴</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/022a.webp" alt="星辰风暴"></div>
+        <div class="card-name" style="color:var(--accent-b)">星辰风暴</div>
+      </div>
+      <div class="char-label">新泽</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/023b.webp" alt="士官长"></div>
+        <div class="card-name">士官长</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/023a.webp" alt="士官长"></div>
+        <div class="card-name" style="color:var(--accent-b)">士官长</div>
+      </div>
+      <div class="char-label">LD·士官长</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/024b.webp" alt="暗炎龙王"></div>
+        <div class="card-name">暗炎龙王</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/024a.webp" alt="暗炎龙王"></div>
+        <div class="card-name" style="color:var(--accent-b)">暗炎龙王</div>
+      </div>
+      <div class="char-label">LD·暗炎龙王</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/025b.webp" alt="兽武者"></div>
+        <div class="card-name">兽武者</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/025a.webp" alt="兽武者"></div>
+        <div class="card-name" style="color:var(--accent-b)">兽武者</div>
+      </div>
+      <div class="char-label">LD·兽武者</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/026b.webp" alt="小魅魔"></div>
+        <div class="card-name">小魅魔</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/026a.webp" alt="小魅魔"></div>
+        <div class="card-name" style="color:var(--accent-b)">小魅魔</div>
+      </div>
+      <div class="char-label">LD·小魅魔</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/027b.webp" alt="七罪"></div>
+        <div class="card-name">七罪</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/027a.webp" alt="七罪"></div>
+        <div class="card-name" style="color:var(--accent-b)">七罪</div>
+      </div>
+      <div class="char-label">LD·七罪</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/028b.webp" alt="蜗耶"></div>
+        <div class="card-name">蜗耶</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/028a.webp" alt="蜗耶"></div>
+        <div class="card-name" style="color:var(--accent-b)">蜗耶</div>
+      </div>
+      <div class="char-label">LD·蜗耶</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/029b.webp" alt="DXY"></div>
+        <div class="card-name">DXY</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/029a.webp" alt="DXY"></div>
+        <div class="card-name" style="color:var(--accent-b)">DXY</div>
+      </div>
+      <div class="char-label">联盟·DXY</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/030b.webp" alt="DC"></div>
+        <div class="card-name">DC</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/030a.webp" alt="DC"></div>
+        <div class="card-name" style="color:var(--accent-b)">DC</div>
+      </div>
+      <div class="char-label">联盟·DC</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/031b.webp" alt="造成"></div>
+        <div class="card-name">造成</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/031a.webp" alt="造成"></div>
+        <div class="card-name" style="color:var(--accent-b)">造成</div>
+      </div>
+      <div class="char-label">联盟·造成</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/032b.webp" alt="媛"></div>
+        <div class="card-name">媛</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/032a.webp" alt="媛"></div>
+        <div class="card-name" style="color:var(--accent-b)">媛</div>
+      </div>
+      <div class="char-label">联盟·媛</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/033b.webp" alt="豆沙"></div>
+        <div class="card-name">豆沙</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/033a.webp" alt="豆沙"></div>
+        <div class="card-name" style="color:var(--accent-b)">豆沙</div>
+      </div>
+      <div class="char-label">联盟·豆沙</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/034b.webp" alt="毒小懒"></div>
+        <div class="card-name">毒小懒</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/034a.webp" alt="毒小懒"></div>
+        <div class="card-name" style="color:var(--accent-b)">毒小懒</div>
+      </div>
+      <div class="char-label">赞助·毒小懒</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/035b.webp" alt="恒"></div>
+        <div class="card-name">恒</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/035a.webp" alt="恒"></div>
+        <div class="card-name" style="color:var(--accent-b)">恒</div>
+      </div>
+      <div class="char-label">赞助·恒</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/036b.webp" alt="万象"></div>
+        <div class="card-name">万象</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/036a.webp" alt="万象"></div>
+        <div class="card-name" style="color:var(--accent-b)">万象</div>
+      </div>
+      <div class="char-label">赞助·万象</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/037b.webp" alt="狄斯"></div>
+        <div class="card-name">狄斯</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/037a.webp" alt="狄斯"></div>
+        <div class="card-name" style="color:var(--accent-b)">狄斯</div>
+      </div>
+      <div class="char-label">赞助·狄斯</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/038b.webp" alt="葵"></div>
+        <div class="card-name">葵</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/038a.webp" alt="葵·A"></div>
+        <div class="card-name" style="color:var(--accent-b)">葵·A</div>
+      </div>
+      <div class="char-label">赞助·葵</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/039b.webp" alt="离殇"></div>
+        <div class="card-name">离殇</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/039a.webp" alt="离殇"></div>
+        <div class="card-name" style="color:var(--accent-b)">离殇</div>
+      </div>
+      <div class="char-label">赞助·离殇</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/040b.webp" alt="笑屠"></div>
+        <div class="card-name">笑屠</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/040a.webp" alt="笑屠"></div>
+        <div class="card-name" style="color:var(--accent-b)">笑屠</div>
+      </div>
+      <div class="char-label">赞助·笑屠</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/041b.webp" alt="本初"></div>
+        <div class="card-name">本初</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/041a.webp" alt="本初"></div>
+        <div class="card-name" style="color:var(--accent-b)">本初</div>
+      </div>
+      <div class="char-label">赞助·本初</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/042b.webp" alt="伊莉雅"></div>
+        <div class="card-name">伊莉雅</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/042a.webp" alt="伊莉雅"></div>
+        <div class="card-name" style="color:var(--accent-b)">伊莉雅</div>
+      </div>
+      <div class="char-label">赞助·伊莉雅</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/043b.webp" alt="羽音"></div>
+        <div class="card-name">羽音</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/043a.webp" alt="羽音"></div>
+        <div class="card-name" style="color:var(--accent-b)">羽音</div>
+      </div>
+      <div class="char-label">赞助·羽音</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/044b.webp" alt="咕咕"></div>
+        <div class="card-name">咕咕</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/044a.webp" alt="咕咕"></div>
+        <div class="card-name" style="color:var(--accent-b)">咕咕</div>
+      </div>
+      <div class="char-label">赞助·咕咕</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/045b.webp" alt="雷老板"></div>
+        <div class="card-name">雷老板</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/045a.webp" alt="雷老板"></div>
+        <div class="card-name" style="color:var(--accent-b)">雷老板</div>
+      </div>
+      <div class="char-label">赞助·雷老板</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/046b.webp" alt="旬柒"></div>
+        <div class="card-name">旬柒</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/046a.webp" alt="旬柒·A"></div>
+        <div class="card-name" style="color:var(--accent-b)">旬柒·A</div>
+      </div>
+      <div class="char-label">赞助·旬柒</div>
+    </div>
+    <div class="char-pair">
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/047b.webp" alt="挲尼"></div>
+        <div class="card-name">挲尼</div>
+      </div>
+      <div class="char-card-wrap">
+        <div class="card-face"><img loading="lazy" src="img/characters/047a.webp" alt="挲尼"></div>
+        <div class="card-name" style="color:var(--accent-b)">挲尼</div>
+      </div>
+      <div class="char-label">赞助·挲尼</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2>踏入天幻凌霄的世界</h2>
+  <p>召集你的伙伴，在六边形版图上展开一场策略与想象力交织的卡牌对决。</p>
+  <a href="#gameplay" class="cta-btn">查看完整规则</a>
+</section>
+
+<footer>
+  <p>天幻凌霄 · 卡牌版图对战桌游 · "幻想有那么一个世界，有着关于梦想与生活的故事。"</p>
+</footer>
+
+<script>
+document.querySelectorAll('nav a').forEach(a=>{a.addEventListener('click',()=>document.querySelector('nav ul').classList.remove('open'))});
+const observer=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+</script>
+
+</body>
+</html>
